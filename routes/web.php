@@ -7,4 +7,9 @@ Route::get('/', [ScholarshipController::class, 'index'])->name('scholarships.ind
 Route::get('/daftar', [ScholarshipController::class, 'create'])->name('scholarships.create');
 Route::post('/daftar', [ScholarshipController::class, 'store'])->name('scholarships.store');
 Route::get('/hasil', [ScholarshipController::class, 'results'])->name('scholarships.results');
-Route::get('/berkas/{application}', [ScholarshipController::class, 'download'])->name('scholarships.download');
+Route::get('/berkas/{application}/{filename}', [ScholarshipController::class, 'preview'])
+    ->where('filename', '.+')
+    ->name('scholarships.preview');
+Route::get('/berkas/{application}/{filename}/download', [ScholarshipController::class, 'download'])
+    ->where('filename', '.+')
+    ->name('scholarships.download');

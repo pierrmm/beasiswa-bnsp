@@ -93,22 +93,23 @@ class ScholarshipController extends Controller
     }
 
     /**
+     * Tampilkan berkas secara langsung di browser (PDF, gambar, dll).
+     */
+    public function preview(ScholarshipApplication $application)
+    {
+        $path = $this->ensureApplicationFileExists($application);
+
+        return Storage::disk('public')->response($path, basename($path));
+    }
+
+    /**
      * Unduh berkas pendaftaran melalui storage publik dengan validasi akses.
      */
     public function download(ScholarshipApplication $application)
     {
-        if (empty($application->berkas_path)) {
-            abort(404, 'Berkas tidak tersedia.');
-        }
+        $path = $this->ensureApplicationFileExists($application);
 
-        if (! Storage::disk('public')->exists($application->berkas_path)) {
-            abort(404, 'File tidak ditemukan di server.');
-        }
-
-        return Storage::disk('public')->download(
-            $application->berkas_path,
-            basename($application->berkas_path)
-        );
+        return Storage::disk('public')->download($path, basename($path));
     }
 
     /**
@@ -131,5 +132,21 @@ class ScholarshipController extends Controller
         }
 
         return (float) config('scholarship.gpa_value');
+    }
+
+    /**
+     * Pastikan berkas ada sebelum dipakai.
+     */
+    private function ensureApplicationFileExists(ScholarshipApplication $application): string
+    {
+        if (empty($application->berkas_path)) {
+            abort(404, 'Berkas tidak tersedia.');
+        }
+
+        if (! Storage::disk('public')->exists($application->berkas_path)) {
+            abort(404, 'File tidak ditemukan di server.');
+        }
+
+        return $application->berkas_path;
     }
 }
